@@ -191,13 +191,13 @@ contract Bgsp {
     string public constant name = "Big Swap";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "ELT";
+    string public constant symbol = "BGSP";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;
 
     /// @notice Total number of tokens in circulation
-    uint public totalSupply = 9_999_999_999e18; // ~10 billion Bgsp
+    uint public totalSupply = 1250000000e18; // 1 billion 250 million Bgsp
 
     /// @notice Address which may mint new tokens
     address public minter;

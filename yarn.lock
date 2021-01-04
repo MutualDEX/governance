@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@eliteswap/v2-core@^1.0.1":
+"@bigswap/v2-core@^1.0.1":
   version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@eliteswap/v2-core/-/v2-core-1.0.4.tgz#7c9d552b5ad6f9824f240aba56e5e9fac1698425"
+  resolved "https://registry.yarnpkg.com/@bigswap/v2-core/-/v2-core-1.0.4.tgz#7c9d552b5ad6f9824f240aba56e5e9fac1698425"
   integrity sha512-7FpIVKJAM7aPhH+o0OJhnZj6H+YRXi19GabQnrx3AZonGVK6AD0Ze4PciWQdzMMryvS2RpQv1VXMMCyyLL0uWQ==
   dependencies:
     abstract-leveldown "^5.0.0"
@@ -577,7 +577,7 @@
     typedarray-to-buffer "^3.1.5"
     typewise "^1.0.3"
     typewise-core "^1.2.0"
-    typewiselite "^1.0.0"
+    typewisbig "^1.0.0"
     ultron "^1.1.1"
     underscore "^1.9.1"
     union-value "^1.0.1"
@@ -4865,7 +4865,7 @@ level-sublevel@6.6.4:
     pull-defer "^0.2.2"
     pull-level "^2.0.3"
     pull-stream "^3.6.8"
-    typewiselite "~1.0.0"
+    typewisbig "~1.0.0"
     xtend "~4.0.0"
 
 level-sublevel@^6.6.4:
@@ -4879,7 +4879,7 @@ level-sublevel@^6.6.4:
     pull-defer "^0.2.2"
     pull-level "^2.0.3"
     pull-stream "^3.6.8"
-    typewiselite "~1.0.0"
+    typewisbig "~1.0.0"
     xtend "~4.0.0"
 
 level-ws@0.0.0, level-ws@^0.0.0:
@@ -7081,9 +7081,9 @@ typewise@^1.0.3:
   dependencies:
     typewise-core "^1.2.0"
 
-typewiselite@^1.0.0, typewiselite@~1.0.0:
+typewisbig@^1.0.0, typewisbig@~1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/typewiselite/-/typewiselite-1.0.0.tgz#c8882fa1bb1092c06005a97f34ef5c8508e3664e"
+  resolved "https://registry.yarnpkg.com/typewisbig/-/typewisbig-1.0.0.tgz#c8882fa1bb1092c06005a97f34ef5c8508e3664e"
   integrity sha1-yIgvobsQksBgBal/NO9chQjjZk4=
 
 ultron@^1.1.1, ultron@~1.1.0:
@@ -8043,3 +8043,4 @@ yn@3.1.1, yn@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
+

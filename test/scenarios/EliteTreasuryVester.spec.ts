@@ -1,15 +1,16 @@
 import chai, { expect } from 'chai'
-import { Contract, BigNumber } from 'ethers'
+import { Contract, constants } from 'ethers'
 import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
-import BigTreasuryVester from '../../build/BigTreasuryVester.json'
+import BigswapV2Factory from '@bigswap/v2-core/build/BigswapV2Factory.json'
+import BigFeeToSetter from '../../build/BigFeeToSetter.json'
 
 import { governanceFixture } from '../fixtures'
-import { mineBlock, expandTo18Decimals } from '../utils'
+import { mineBlock } from '../utils'
 
 chai.use(solidity)
 
-describe('scenario:BigTreasuryVester', () => {
+describe('scenario:BigFeeToSetter', () => {
   const provider = new MockProvider({
     ganacheOptions: {
       hardfork: 'istanbul',
@@ -17,64 +18,79 @@ describe('scenario:BigTreasuryVester', () => {
       gasLimit: 9999999,
     },
   })
-  const [wallet] = provider.getWallets()
+  const [wallet, other] = provider.getWallets()
   const loadFixture = createFixtureLoader([wallet], provider)
 
-  let bgsp: Contract
-  let timelock: Contract
   beforeEach(async () => {
-    const fixture = await loadFixture(governanceFixture)
-    bgsp = fixture.bgsp
-    timelock = fixture.timelock
+    await loadFixture(governanceFixture)
   })
 
-  let treasuryVester: Contract
-  let vestingAmount: BigNumber
-  let vestingBegin: number
-  let vestingCliff: number
+  let factory: Contract
+  beforeEach('deploy bigswap v2', async () => {
+    factory = await deployContract(wallet, BigswapV2Factory, [wallet.address])
+  })
+
+  let feeToSetter: Contract
   let vestingEnd: number
-  beforeEach('deploy treasury vesting contract', async () => {
+  beforeEach('deploy feeToSetter vesting contract', async () => {
     const { timestamp: now } = await provider.getBlock('latest')
-    vestingAmount = expandTo18Decimals(100)
-    vestingBegin = now + 60
-    vestingCliff = vestingBegin + 60
-    vestingEnd = vestingBegin + 60 * 60 * 24 * 365
-    treasuryVester = await deployContract(wallet, BigTreasuryVester, [
-      bgsp.address,
-      timelock.address,
-      vestingAmount,
-      vestingBegin,
-      vestingCliff,
+    vestingEnd = now + 60
+    // 3rd constructor arg should be timelock, just mocking for testing purposes
+    // 4th constructor arg should be feeTo, just mocking for testing purposes
+    feeToSetter = await deployContract(wallet, BigFeeToSetter, [
+      factory.address,
       vestingEnd,
+      wallet.address,
+      other.address,
     ])
 
-    // fund the treasury
-    await bgsp.transfer(treasuryVester.address, vestingAmount)
+    // set feeToSetter to be the vesting contract
+    await factory.setFeeToSetter(feeToSetter.address)
   })
 
-  it('setRecipient:fail', async () => {
-    await expect(treasuryVester.setRecipient(wallet.address)).to.be.revertedWith(
-      'BigTreasuryVester::setRecipient: unauthorized'
+  it('setOwner:fail', async () => {
+    await expect(feeToSetter.connect(other).setOwner(other.address)).to.be.revertedWith(
+      'BigFeeToSetter::setOwner: not allowed'
     )
   })
 
-  it('claim:fail', async () => {
-    await expect(treasuryVester.claim()).to.be.revertedWith('BigTreasuryVester::claim: not time yet')
-    await mineBlock(provider, vestingBegin + 1)
-    await expect(treasuryVester.claim()).to.be.revertedWith('BigTreasuryVester::claim: not time yet')
+  it('setOwner', async () => {
+    await feeToSetter.setOwner(other.address)
   })
 
-  it('claim:~half', async () => {
-    await mineBlock(provider, vestingBegin + Math.floor((vestingEnd - vestingBegin) / 2))
-    await treasuryVester.claim()
-    const balance = await bgsp.balanceOf(timelock.address)
-    expect(vestingAmount.div(2).sub(balance).abs().lte(vestingAmount.div(2).div(10000))).to.be.true
-  })
-
-  it('claim:all', async () => {
+  it('setFeeToSetter:fail', async () => {
+    await expect(feeToSetter.setFeeToSetter(other.address)).to.be.revertedWith(
+      'BigFeeToSetter::setFeeToSetter: not time yet'
+    )
     await mineBlock(provider, vestingEnd)
-    await treasuryVester.claim()
-    const balance = await bgsp.balanceOf(timelock.address)
-    expect(balance).to.be.eq(vestingAmount)
+    await expect(feeToSetter.connect(other).setFeeToSetter(other.address)).to.be.revertedWith(
+      'BigFeeToSetter::setFeeToSetter: not allowed'
+    )
+  })
+
+  it('setFeeToSetter', async () => {
+    await mineBlock(provider, vestingEnd)
+    await feeToSetter.setFeeToSetter(other.address)
+  })
+
+  it('toggleFees:fail', async () => {
+    await expect(feeToSetter.toggleFees(true)).to.be.revertedWith('BigFeeToSetter::toggleFees: not time yet')
+    await mineBlock(provider, vestingEnd)
+    await expect(feeToSetter.connect(other).toggleFees(true)).to.be.revertedWith('BigFeeToSetter::toggleFees: not allowed')
+  })
+
+  it('toggleFees', async () => {
+    let feeTo = await factory.feeTo()
+    expect(feeTo).to.be.eq(constants.AddressZero)
+
+    await mineBlock(provider, vestingEnd)
+
+    await feeToSetter.toggleFees(true)
+    feeTo = await factory.feeTo()
+    expect(feeTo).to.be.eq(other.address)
+
+    await feeToSetter.toggleFees(false)
+    feeTo = await factory.feeTo()
+    expect(feeTo).to.be.eq(constants.AddressZero)
   })
 })

@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EthereumBigswap/governance.git"
+    "url": "git+https://github.com/MutualDEX/governance.git"
   },
   "keywords": [
     "bigswap",
@@ -45,7 +45,7 @@
     "bgsp"
   ],
   "bugs": {
-    "url": "https://github.com/EthereumBigswap/governance/issues"
+    "url": "https://github.com/MutualDEX/governance/issues"
   },
-  "homepage": "https://bigswap.org"
+  "homepage": "https://bigswap.app"
 }

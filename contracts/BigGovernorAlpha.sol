@@ -6,7 +6,7 @@ contract BigGovernorAlpha {
     string public constant name = "Bigswap Governor Alpha";
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
-    function quorumVotes() public pure returns (uint) { return 400_000_000e18; } // 4% of Bgsp
+    function quorumVotes() public pure returns (uint) { return 300_000_000e18; } // 3% of Bgsp
 
     /// @notice The number of votes required in order for a voter to become a proposer
     function proposalThreshold() public pure returns (uint) { return 100_000_000e18; } // 1% of Bgsp
